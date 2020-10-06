@@ -3,7 +3,7 @@
 	$userController = new UserController();
 
 	$users = $userController->get();
-	echo json_encode($users);
+	//echo json_encode($users);
 	
 ?>
 <!DOCTYPE html>
@@ -45,6 +45,28 @@
 			</ol>
 		</nav>
 
+		<!-- notificacion -->
+		<?php if (isset($_SESSION['status']) && $_SESSION['status']=="success"): ?>
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Correcto!</strong> <?= $_SESSION['message'] ?>.
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<?php unset($_SESSION['status']); ?>
+		<?php endif ?>
+
+		<?php if (isset($_SESSION['status']) && $_SESSION['status']=="error"): ?>
+			<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Error!</strong> <?= $_SESSION['message'] ?>.
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<?php unset($_SESSION['status']); ?>
+		<?php endif ?>
+
+
 		<div class="row">
 			<div class="col-12">
 				<div class="card mb-4">
@@ -65,20 +87,30 @@
 						    </tr>
 						  </thead>
 						  <tbody>
-						    <tr>
-						      <th scope="row">1</th>
-						      <td>Mark</td>
-						      <td><a href="mailto:otto@example.com">Otto@example.com</a></td>
-						      <td>@mdo</td>
-						      <td>
-						      	<button type="button" class="btn btn-warning">
-						      		<i class="fa fa-pencil-alt"></i>Editar
-						    	</button>
-						      	<button type="button" onclick="remove(1)" class="btn btn-danger">
-						      		<i class="fa fa-trash"></i>Eliminar
-						    	</button>
-						  	  </td>
-						    </tr>
+						  	<?php if(isset($users) && count($users)>0): ?>
+						  	<?php foreach ($users as $user): ?>
+							    <tr>
+							      <th scope="row"><?= $user['id'] ?></th>
+							      <td><?= $user['name'] ?></td>
+							      <td><a href="mailto:<?= $user['email'] ?>"><?= $user['email'] ?></a></td>
+							      <td>
+							      	<?php if ($user['status']): ?>
+							      		<span class="badge badge-success">Activo</span>
+							      	<?php else: ?>
+							      		<span class="badge badge-danger">Inactivo</span>
+							      	<?php endif ?>
+							      </td>
+							      <td>
+							      	<button type="button" class="btn btn-warning">
+							      		<i class="fa fa-pencil-alt"></i>Editar
+							    	</button>
+							      	<button type="button" onclick="remove(1)" class="btn btn-danger">
+							      		<i class="fa fa-trash"></i>Eliminar
+							    	</button>
+							  	  </td>
+							    </tr>
+							<?php endforeach ?>
+							<?php endif ?>
 						  </tbody>
 						</table>
 					</div>
@@ -99,7 +131,7 @@
 	        		<span aria-hidden="true">&times;</span>
 	        	</button>
 	    	</div>
-	    	<form onsubmit="return validateRegister()">
+	    	<form method="POST" action="controllers/userController.php" onsubmit="return validateRegister()">
 	    		<div class="modal-body">
 	    			<!-- NOMBRE COMPLETO -->
 	    			<div class="form-group">
@@ -110,7 +142,7 @@
 									<i class="fa fa-user"></i>
 								</span>
 							</div>
-							<input type="text" class="form-control" id="name" placeholder="Juan Perez" aria-label="Nombre" aria-describedby="basic-addon1" required>
+							<input type="text" class="form-control" id="name" name="name" placeholder="Juan Perez" aria-label="Nombre" aria-describedby="basic-addon1" required>
 						</div>
 					    <small id="emailHelp" class="form-text text-muted">No ingresar números.</small>
 					</div>
@@ -124,7 +156,7 @@
 									<i class="fa fa-envelope"></i>
 								</span>
 							</div>
-							<input type="text" class="form-control" id="email" placeholder="Juanito@domain.com" aria-label="emailHelp" aria-describedby="basic-addon1" required>
+							<input type="text" class="form-control" id="email" name="email" placeholder="Juanito@domain.com" aria-label="emailHelp" aria-describedby="basic-addon1" required>
 						</div>
 					</div>
 
@@ -137,7 +169,7 @@
 									<i class="fa fa-lock"></i>
 								</span>
 							</div>
-							<input type="password" id="password" class="form-control" placeholder="* * * * *" aria-label="email" aria-describedby="basic-addon1" minlength="4" required>
+							<input type="password" id="password" name="password" class="form-control" placeholder="* * * * *" aria-label="email" aria-describedby="basic-addon1" minlength="4" required>
 						</div>
 					</div>
 
@@ -159,6 +191,7 @@
 		    	<div class="modal-footer">
 		    		<button type="button" class="btn btn-warning" data-dismiss="modal">Cancelar</button>
 		    		<button type="submit" class="btn btn-primary">Guardar</button>
+		    		<input type="hidden" name="action" value="store">
 		    	</div>
 	    	</form>
 	    </div>
