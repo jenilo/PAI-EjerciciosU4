@@ -101,7 +101,7 @@
 							      	<?php endif ?>
 							      </td>
 							      <td>
-							      	<button type="button" class="btn btn-warning">
+							      	<button data-toggle="modal" data-target="#staticBackdrop" data-info='<?= json_encode($user) ?>' type="button" class="btn btn-warning" onclick="editar(this)">
 							      		<i class="fa fa-pencil-alt"></i>Editar
 							    	</button>
 							      	<button type="button" onclick="remove(1)" class="btn btn-danger">
@@ -127,11 +127,11 @@
 	    <div class="modal-content">
 	    	<div class="modal-header">
 	      		<h5 class="modal-title" id="staticBackdropLabel">Agregar Usuario</h5>
-	        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	        	<button onclick="add()" type="button" class="close" data-dismiss="modal" aria-label="Close">
 	        		<span aria-hidden="true">&times;</span>
 	        	</button>
 	    	</div>
-	    	<form method="POST" action="controllers/userController.php" onsubmit="return validateRegister()">
+	    	<form id="form" method="POST" action="controllers/userController.php" onsubmit="return validateRegister()">
 	    		<div class="modal-body">
 	    			<!-- NOMBRE COMPLETO -->
 	    			<div class="form-group">
@@ -191,7 +191,8 @@
 		    	<div class="modal-footer">
 		    		<button type="button" class="btn btn-warning" data-dismiss="modal">Cancelar</button>
 		    		<button type="submit" class="btn btn-primary">Guardar</button>
-		    		<input type="hidden" name="action" value="store">
+		    		<input type="hidden" name="action" id="action" value="store">
+		    		<input type="hidden" name="id" id="id" value="id">
 		    	</div>
 	    	</form>
 	    </div>
@@ -204,6 +205,23 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script type="text/javascript">
+
+		function editar(target){
+			var info = $(target).data('info');
+			$("#name").val(info.name);
+			$("#email").val(info.email);
+			$("#password").val(info.password);
+			$("#password2").val(info.password);
+
+			$("#id").val(info.id);
+			$("#action").val('update');
+		}
+
+		function add(){
+			$("#action").val("store");
+			document.getElementById("form").reset();
+		}
+
 		function validateRegister(){
 			if ($("#password").val() === $("#password2").val()) {
 				return true;
