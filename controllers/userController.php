@@ -3,24 +3,30 @@
 	include_once "conection.php";
 
 	if (isset($_POST) && isset($_POST['action'])) {
-		$UserController = new UserController();
+		if ($_POST['token'] === $_SESSION['token']) {
+			$UserController = new UserController();
 
-		switch ($_POST['action']) {
-			case 'store':
-				$name = strip_tags($_POST['name']);
-				$email = strip_tags($_POST['email']);
-				$password = strip_tags($_POST['password']);
+			switch ($_POST['action']) {
+				case 'store':
+					$name = strip_tags($_POST['name']);
+					$email = strip_tags($_POST['email']);
+					$password = strip_tags($_POST['password']);
 
-				$UserController->store($name,$email,$password);
-			break;
-			case 'update':
-				$name = strip_tags($_POST['name']);
-				$email = strip_tags($_POST['email']);
-				$password = strip_tags($_POST['password']);
-				$id = strip_tags($_POST['id']);
+					$UserController->store($name,$email,$password);
+				break;
+				case 'update':
+					$name = strip_tags($_POST['name']);
+					$email = strip_tags($_POST['email']);
+					$password = strip_tags($_POST['password']);
+					$id = strip_tags($_POST['id']);
 
-				$UserController->update($name,$email,$password,$id);
-			break;
+					$UserController->update($name,$email,$password,$id);
+				break;
+				case 'remove':
+					$id = strip_tags($_POST['id']);
+					echo json_encode($UserController->remove($id));
+				break;
+			}
 		}
 	}
 
@@ -103,6 +109,41 @@
 				$_SESSION['message'] = "Error durante la conexión.";
 				header('Location: '.$_SERVER['HTTP_REFERER']);
 			}
+		}
+		public function remove($id){
+			$conn = connect();
+			if (!$conn->connect_error) {
+				if($id!=""){
+					$query = "DELETE FROM users WHERE id= ?";
+					$prepared_query = $conn->prepare($query);
+					$prepared_query->bind_param('i',$id);
+					if ($prepared_query->execute()) {
+						$respuesta = array(
+							'status' => "success",
+							'message' => "El registro se ha eliminado correctamente.",
+						);
+					}
+					else{
+						$respuesta = array(
+							'status' => "error",
+							'message' => "El registro no se ha eliminado.",
+						);
+					}
+				}
+				else{
+					$respuesta = array(
+						'status' => "error",
+						'message' => "Verifique la información enviada.",
+					);
+				}
+			}
+			else{
+				$respuesta = array(
+					'status' => "error",
+					'message' => "Error durante la conexión.",
+				);
+			}
+			return $respuesta;
 		}
 	}
 

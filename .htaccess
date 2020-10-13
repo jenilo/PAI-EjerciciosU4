@@ -1,0 +1,4 @@
+Options +FollowSymLinks
+RewriteEngine on 
+
+RewriteRule ^users$ controllers/userController.php
